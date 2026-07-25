@@ -40,6 +40,8 @@ def segmentor_train(train_df, val_df, epoch=15, device='cuda'):
     best_val_dice = 0.0 # Track best Dice score (higher is better)
     val_loss_list=[]
     train_loss_list=[]
+    patience = 0
+    
     for e in range(epoch):
         print(f"----------- Epoch {e+1} ------------")
 
@@ -60,7 +62,6 @@ def segmentor_train(train_df, val_df, epoch=15, device='cuda'):
         train_loss = 0.0
         train_dice_sum = 0.0
         segmentor_model.train()
-        
         for (images, masks , metadata , targets , idx, uid) in train_loader: 
             images = images.to(device)
             # Ensure masks are (B, 1, H, W) and float32

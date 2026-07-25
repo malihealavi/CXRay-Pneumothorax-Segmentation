@@ -4,6 +4,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast, GradScaler
 from sklearn.metrics import roc_auc_score, f1_score
+import segmentation_models_pytorch as smp
 from src.models.classifier import MedicalFusionClassifier
 from src.models.segmentor import build_stage2_segmentor
 from src.data.Dataset import PneumothoraxDataset

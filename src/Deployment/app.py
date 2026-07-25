@@ -20,12 +20,12 @@ classifier_model = MedicalFusionClassifier(
     num_meta_features=cfg.model.num_meta_features
 ).to(device)
 classifier_model.load_state_dict(
-    torch.load(cfg.model_paths.classifier_checkpoint, map_location=device)
+    torch.load(cfg.model_path.classifier_checkpoint, map_location=device)
 )
 
 segmentor_model = build_stage2_segmentor().to(device) # If build_stage2_segmentor takes args, use cfg.model here too
 segmentor_model.load_state_dict(
-    torch.load(cfg.model_paths.segmentor_checkpoint, map_location=device)
+    torch.load(cfg.model_path.segmentor_checkpoint, map_location=device)
 )
 
 

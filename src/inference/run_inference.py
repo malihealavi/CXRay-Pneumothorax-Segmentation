@@ -7,25 +7,15 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 from src.models.classifier import MedicalFusionClassifier
 from src.models.segmentor import build_stage2_segmentor
-from src.data.prepare import create_df_patient
+from src.data.prepare import load_stage2_test_dataframe
 from src.inference.inference import inference
 from configs.configs import get_config
 
 cfg = get_config()
 
-stage2_image_path = sorted(glob(os.path.join(cfg.paths.stage2_root, cfg.paths.stage2_test_dicom_glob)))
-stage2_image_dir = os.path.join(cfg.paths.stage2_root, "stage_2_images") + "/"
-test_df_stage2 = create_df_patient(stage2_image_path, stage2_image_dir, inference=True )
-test_df_stage2['class'] = test_df_stage2['EncodedPixels'].apply(
-    lambda x: 0 if (pd.isna(x) or str(x).strip() == '-1' or str(x).strip() == '') else 1
-)
-test_df_stage2['Sex'] =test_df_stage2['Sex'].map({'M': 1, 'F': 0})
-test_df_stage2['ViewPosition'] = test_df_stage2['ViewPosition'].map({'AP': 1, 'PA': 0})
-test_df_stage2['Age'] = test_df_stage2['Age'].astype(int)
-
-
-scaler = StandardScaler()
-test_df_stage2[['Age','Sex', 'ViewPosition']] = scaler.fit_transform(test_df_stage2[['Age','Sex', 'ViewPosition']])
+# No ground-truth masks exist for genuinely new inference data, so we pass
+# an empty masks_df (create_df_patient just leaves EncodedPixels unset).
+test_df_stage2 = load_stage2_test_dataframe(cfg)
 
 torch.serialization.add_safe_globals([np._core.multiarray.scalar])
 
