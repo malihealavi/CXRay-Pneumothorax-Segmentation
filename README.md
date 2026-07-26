@@ -7,7 +7,7 @@ An AI pipeline that looks at a chest X-ray and answers two questions:
 
 It's built as a **two-stage pipeline** rather than one big model — the reasoning behind that, and everything else in the repo, is explained below in plain language.
 
-> Built from the [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition, refactored from a single Kaggle notebook into a modular codebase.
+> Built from the [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition, refactored from a single Kaggle notebook into a modular codebase. The ready-to-use model is deployed on [huggingface space](https://huggingface.co/spaces/MaliheAlavi/XRay-Pneomothorax-Segmentaion). you can upload the chest xray DICOM file and seewhat the model will predict.
 
 ---
 
