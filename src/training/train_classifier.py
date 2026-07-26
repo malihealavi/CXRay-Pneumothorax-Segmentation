@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import torch.nn as nn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import  DataLoader
@@ -128,6 +129,9 @@ def classifier_train(train_df,val_df, epoch=10, device='cuda'):
         best_gmean_threshold , best_gmean =  gmean_best_threshold(all_vtargets, all_vprobs)
         pr_auc = pr_auc_score(all_vtargets, all_vprobs)
         auc = roc_auc_score(all_vtargets, all_vprobs)
+
+        all_vprobs = np.asarray(all_vprobs)
+        all_vtargets = np.asarray(all_vtargets)
         
         all_vpreds= (all_vprobs > best_f2_threshold).astype(int)
         # best_threshold = 0.5
@@ -145,10 +149,8 @@ def classifier_train(train_df,val_df, epoch=10, device='cuda'):
         if epoch_avg_val_loss < best_val_loss:
             best_val_loss = epoch_avg_val_loss
             save_path = f"best_classifier.pth"
-            torch.save({
-                'model_state_dict': classifier_model.state_dict(),
-                'cls_threshold': float(best_f2_threshold),   # from this epoch's PR curve
-                'epoch': float(e)}, save_path)
+            torch.save(classifier_model.state_dict(), save_path)
+            
             
             best_cls = classifier_model
             print(f"[*] Val loss improved. Model saved to {save_path}")

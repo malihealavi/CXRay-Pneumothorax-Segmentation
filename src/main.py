@@ -1,35 +1,4 @@
-"""
-main.py
-=======
-End-to-end training entry point that reproduces the data-prep + training
-flow that was actually *executed* in `notebook/pneumothorax-seg-model (7).ipynb`:
 
-  1. Read the Stage-1 DICOMs + train-rle.csv and build train_df / test_df
-     (encoding Sex/ViewPosition, scaling Age/Sex/ViewPosition), then
-     re-label test_df with the Stage-2 ground truth
-     -> src/data/prepare.py:load_stage1_dataframes()
-
-  2. Split 80/20 off the labeled test_df and fold the 80% into train_df to
-     form `combined_df` (the notebook's "Train on complete Stage1 data,
-     no validation" approach). The 20% (`val_df`) is held out, matching
-     the notebook -- it isn't used for training here either.
-
-  3. Train the classifier on combined_df -> src/training/train_cls_seg.py:classifier()
-  4. Train the segmentor on combined_df  -> src/training/train_cls_seg.py:segmentor()
-
-Both training functions save their own checkpoints
-(best_classifier.pth / best_segmentor.pth) into the current working
-directory, exactly like the notebook did.
-
-Before running, set your dataset locations (defaults shown, see configs/configs.py):
-    export PNX_DATASET_ROOT=data/raw/siim-acr-pneumothorax-segmentation-data/pneumothorax
-    export PNX_STAGE2_ROOT=data/raw/siim-acr-pneumothorax-segmentation
-(scripts/download_data.sh will download the data into these exact paths.)
-
-Usage:
-    python main.py
-    python main.py --classifier-epochs 6 --segmentor-epochs 10
-"""
 import argparse
 import gc
 
@@ -40,6 +9,8 @@ from sklearn.model_selection import train_test_split
 from configs.configs import get_config
 from src.data.prepare import load_stage1_dataframes
 from src.training.train_cls_seg import classifier, segmentor
+from src.training.train_classifier import classifier_train
+from src.training.train_segmentor import segmentor_train
 from src.utils.utils import seed_everything
 
 
@@ -88,8 +59,7 @@ def main():
     # 3) Stage 1: train the classifier on the full combined dataframe.
     #    Saves best_classifier.pth as a side effect.
     # ------------------------------------------------------------------
-    classifier_model = classifier(combined_df, device=device, epoch=args.classifier_epochs)
-
+    classifier_model = classifier_train(combined_df, val_df, epoch=args.classifier_epochs, device=device )
     # VRAM cleanup between stages, matching the notebook
     classifier_model.to("cpu")
     gc.collect()
@@ -100,8 +70,7 @@ def main():
     #    (internally filtered down to the positive/pneumothorax cases).
     #    Saves best_segmentor.pth as a side effect.
     # ------------------------------------------------------------------
-    segmentor_model = segmentor(combined_df, device=device, epoch=args.segmentor_epochs)
-
+    segmentor_model = segmentor_train(combined_df, val_df, epoch=args.classifier_epochs, device=device )
     print("Done. Checkpoints saved to best_classifier.pth / best_segmentor.pth in the current directory.")
     return classifier_model, segmentor_model
 

@@ -39,8 +39,8 @@ class DataPaths:
 
 @dataclass
 class ModelPath:
-    classifier_checkpoint: str =  "checkpoints/best_classifier.pth"
-    segmentor_checkpoint: str =  "checkpoints/best_segmentor.pth"
+    classifier_checkpoint: str =  "best_classifier.pth"
+    segmentor_checkpoint: str =  "best_segmentor.pth"
 
 @dataclass
 class ModelConfig:

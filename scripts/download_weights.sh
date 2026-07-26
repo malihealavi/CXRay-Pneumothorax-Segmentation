@@ -7,8 +7,8 @@
 #
 #   Kaggle dataset: malihealavi/pneumothorax-classifier
 #     https://www.kaggle.com/datasets/malihealavi/pneumothorax-classifier
-#   -> checkpoints/best_classifier.pth
-#   -> checkpoints/best_segmentor.pth
+#   -> best_classifier.pth
+#   -> best_segmentor.pth
 #
 # Requirements:
 #   1. pip install kaggle
@@ -43,7 +43,7 @@ DATASET_SLUG="malihealavi/pneumothorax-classifier"
 CLASSIFIER_FILE="best_classifier.pth"
 SEGMENTOR_FILE="best_segmentor.pth"
 
-DEST_DIR="checkpoints"
+DEST_DIR="."
 mkdir -p "$DEST_DIR"
 
 echo "==> Checking for the Kaggle CLI ..."
