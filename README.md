@@ -183,24 +183,11 @@ All the "knobs" of the project — dataset paths, model choices, batch sizes, le
 
 ---
 
-## Understanding the Interpretation Notebooks
-
-This is the part of the project that answers *"okay, but can I trust it, and why does it make the mistakes it makes?"* — arguably the most important section for a medical AI project, since a model that's simply "82% accurate" tells you very little about whether it's safe to rely on.
-
-### `EDA/eda-of-pneumothorax-dataset.ipynb` — Getting to know the data
-Before building any model, this notebook explores the raw dataset: how many X-rays actually have a pneumothorax, how age and sex relate to it (interestingly, young men show up disproportionately often — consistent with the known medical fact that "primary spontaneous pneumothorax" tends to affect tall, thin, young men), how the AP/PA view position affects things, and what the decoded masks actually look like on top of a real X-ray. This step is what informs choices made later, like including age/sex/view as model inputs.
-
-### `base-models/basemodels.ipynb` — Simple baselines before the real model
-Before trusting a complex deep learning model, it's good practice to check: *how well can you do with something dumb and simple?* This notebook tries a handful of baselines using **only the patient metadata** (age, sex, view position) — no image at all:
-- Always predicting "healthy"
-- Always predicting "positive"
-- Random guessing
-- Logistic Regression, XGBoost, and Random Forest on just those three metadata columns
-
-The point isn't that these are meant to be used — it's a sanity check and a scoreboard. If the real image-based model can't clearly beat "a random forest looking at nothing but age and sex," that's a red flag that the image data isn't adding much value.
+##  Interpretation 
 
 ### `interpretation/evaluate_holdout.ipynb` — How good is the classifier, really?
 This loads the trained classifier and segmentor, runs them on a held-out validation set (X-rays the model never trained on), and computes a **confusion matrix**: how many true positives, false positives, true negatives, and false negatives there were, plus precision and recall. In a medical screening context, **recall** (how many actual pneumothorax cases the model catches) usually matters more than raw accuracy — missing a real case is a far more costly mistake than a false alarm.
+
 
 ### `interpretation/error_analysis.ipynb` — Looking at the model's mistakes
 This is where the project gets genuinely interpretable. It uses a technique called **Grad-CAM**, which produces a heatmap over the X-ray showing which regions of the image most influenced the model's decision — like a spotlight showing where the model was "looking." For each mistake the classifier made, the notebook shows a 3-panel comparison:
@@ -210,11 +197,12 @@ This is where the project gets genuinely interpretable. It uses a technique call
 3. The relevant mask — for a **missed case** (false negative), the true location of the pneumothorax it failed to notice; for a **false alarm** (false positive), the model's own hallucinated prediction
 
 This lets you visually check things like: "did the model miss this case because the pneumothorax was very small and subtle, or was it looking at a completely irrelevant part of the image?" That distinction matters a lot for deciding how to improve the model next.
+![Project Logo](./assets/FN-FP/output.png)
+![Project Logo](./assets/FN-FP/output1.png)
+![Project Logo](./assets/FN-FP/output2.png)
 
 ### `interpretation/tp_cases.ipynb` — Confirming the model gets things right for the right reasons
 Even when the model is *correct*, it's worth checking *why*. This notebook takes the model's **true positives** (cases it correctly flagged as pneumothorax) and shows a 4-panel view: the original image, the Grad-CAM attention heatmap, the true mask, and the predicted mask, side by side. The goal is to confirm the model's attention actually overlaps with the real collapsed-lung region — rather than, say, getting the right answer by coincidentally focusing on a chest tube or hospital equipment that tends to appear alongside real pneumothorax cases in the training data (a classic way medical AI models can be "right for the wrong reason").
-
-**In short:** the EDA notebook explains the data, the baseline notebook sets a floor to beat, `evaluate_holdout` tells you the numbers, and `error_analysis` / `tp_cases` tell you the *story* behind those numbers.
 
 ---
 
