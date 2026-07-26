@@ -202,7 +202,9 @@ This lets you visually check things like: "did the model miss this case because 
 ![Project Logo](./assets/FN-FP/output2.png)
 
 ### `interpretation/tp_cases.ipynb` — Confirming the model gets things right for the right reasons
+
 Even when the model is *correct*, it's worth checking *why*. This notebook takes the model's **true positives** (cases it correctly flagged as pneumothorax) and shows a 4-panel view: the original image, the Grad-CAM attention heatmap, the true mask, and the predicted mask, side by side. The goal is to confirm the model's attention actually overlaps with the real collapsed-lung region — rather than, say, getting the right answer by coincidentally focusing on a chest tube or hospital equipment that tends to appear alongside real pneumothorax cases in the training data (a classic way medical AI models can be "right for the wrong reason").
+
 ![Project Logo](./assets/TP/output.png)
 ![Project Logo](./assets/TP/output1.png)
 ![Project Logo](./assets/TP/output2.png)
