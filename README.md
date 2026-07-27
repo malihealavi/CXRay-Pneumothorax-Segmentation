@@ -3,8 +3,6 @@ What is Pneumothorax and how can data science help?
 
 Pneumothorax refers to the presence of air in the pleural space, between the lung and the chest wall. This causes collapsed lung, because thus the dilation of the chest wall would not involve the dilation of the lung. Shortness of breath, pain in the chest can be symptoms, the level of severity can vary.Experts say this disease can be identified from chest x-ray images, and here comes in the data science.
 
-<img src="https://www.fairview.org/hlimg/krames/344230.jpg" width="300px">
-
 Using a dataset with x-ray images and their diagnosis with the exact place of the air in pleura, a model could be trained to recognize Pneumothorax. Additional information about the patients could also be useful when analyzing an x-ray image.
 
 An AI pipeline that looks at a chest X-ray and answers two questions:
@@ -14,8 +12,7 @@ An AI pipeline that looks at a chest X-ray and answers two questions:
 
 It's built as a **two-stage pipeline** rather than one big model — the reasoning behind that, and everything else in the repo, is explained below in plain language.
 
-> Built from the [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition, refactored from a single Kaggle notebook into a modular codebase. The ready-to-use model is deployed on [huggingface space](https://huggingface.co/spaces/MaliheAlavi/XRay-Pneomothorax-Segmentaion). you can upload the chest xray DICOM file and seewhat the model will predict.
-
+> Built from the [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition, refactored from a single Kaggle notebook into a modular codebase. 
 ---
 
 ## Table of Contents
@@ -176,17 +173,9 @@ Both classifier training scripts use a **progressive resizing** trick: early epo
 | `run_inference.py` | A ready-to-run script: loads both trained checkpoints, runs `inference.py` over the full competition test set, and writes out a `submission.csv` in the exact format Kaggle expects. |
 
 ### Deployment (`src/Deployment/app.py`)
+>The ready-to-use model is deployed on [huggingface space](https://huggingface.co/spaces/MaliheAlavi/XRay-Pneomothorax-Segmentaion). you can upload the chest xray DICOM file and seewhat the model will predict.
+
 A [Gradio](https://www.gradio.app/) web app — the simplest way to actually *use* the model. A user uploads a DICOM X-ray file and fills in age/sex/view position, and the app returns a plain-English diagnosis plus (if positive) a red overlay showing where the model thinks the pneumothorax is.
-
-### Shared utilities (`src/utils/utils.py`)
-Small helper functions used everywhere else in the codebase:
-- `rle2mask` / `mask2rle`: convert between the competition's compact text encoding of a mask and an actual image-shaped grid of 0s/1s.
-- `calculate_dice_coef`: computes the Dice score (see below).
-- `f2_best_threshold`, `gmean_best_threshold`, `custom_threshold`: different strategies for picking the "how confident does the model need to be before saying yes" cutoff.
-- `seed_everything`: sets random seeds across Python, NumPy, and PyTorch so training runs are reproducible.
-
-### Configuration (`configs/configs.py`)
-All the "knobs" of the project — dataset paths, model choices, batch sizes, learning rates, thresholds — live in one typed Python file instead of being scattered as magic numbers. This is meant to be the single source of truth: change a value here rather than hunting through training scripts.
 
 ---
 
@@ -207,7 +196,8 @@ This lets you visually check things like: "did the model miss this case because 
 ![Project Logo](./assets/FN-FP/output.png)
 ![Project Logo](./assets/FN-FP/output1.png)
 ![Project Logo](./assets/FN-FP/output2.png)
-
+![Project Logo](./assets/FN-FP/output3.png)
+![Project Logo](./assets/FN-FP/output4.png)
 ### `interpretation/tp_cases.ipynb` — Confirming the model gets things right for the right reasons
 
 Even when the model is *correct*, it's worth checking *why*. This notebook takes the model's **true positives** (cases it correctly flagged as pneumothorax) and shows a 4-panel view: the original image, the Grad-CAM attention heatmap, the true mask, and the predicted mask, side by side. The goal is to confirm the model's attention actually overlaps with the real collapsed-lung region — rather than, say, getting the right answer by coincidentally focusing on a chest tube or hospital equipment that tends to appear alongside real pneumothorax cases in the training data (a classic way medical AI models can be "right for the wrong reason").
