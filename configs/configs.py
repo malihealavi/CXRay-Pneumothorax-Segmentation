@@ -50,8 +50,6 @@ class ModelConfig:
     segmentor_encoder: str = "timm-efficientnet-b4"
     segmentor_encoder_weights: str = "imagenet"
 
-
-
 @dataclass
 class TrainConfig:
     seed: int = 42

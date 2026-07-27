@@ -8,7 +8,7 @@ from albumentations.pytorch import ToTensorV2
 from configs.configs import get_config  
 from src.models.classifier import MedicalFusionClassifier
 from src.models.segmentor import build_stage2_segmentor
-
+import joblib
 # ---------------------------------------------------------
 # 1. Global Setup & Model Loading
 # ---------------------------------------------------------
@@ -77,10 +77,12 @@ def predict_pneumothorax(dicom_file, age, sex, view_position):
     
     # 3. Prepare Metadata Tensor
     # Assuming Sex: M=0, F=1 and ViewPosition: AP=0, PA=1 based on standard encoding
-    sex_val = 0.0 if sex == "M" else 1.0
-    view_val = 0.0 if view_position == "AP" else 1.0
-    meta_tensor = torch.tensor([[float(age), sex_val, view_val]], dtype=torch.float32).to(device)
-    
+    scaler = joblib.load(cfg.paths.processed_dir + "/meta_scaler.joblib")
+    sex_val = 1.0 if sex == "M" else 0.0
+    view_val = 1.0 if view_position == "AP" else 0.0
+    scaled = scaler.transform([[float(age), sex_val, view_val]])
+    meta_tensor = torch.tensor(scaled, dtype=torch.float32).to(device)
+  
     # 4. Run Stage 1: Classifier
     with torch.no_grad():
         cls_logits = classifier_model(img_tensor, meta_tensor)

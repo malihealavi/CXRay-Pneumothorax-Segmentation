@@ -41,16 +41,16 @@ def segmentor_train(train_df, val_df, epoch=15, device='cuda'):
     val_loss_list=[]
     train_loss_list=[]
     patience = 0
-    
+    best_sgm= None
     for e in range(epoch):
         print(f"----------- Epoch {e+1} ------------")
 
-        size = 256 if e<=6 else (512 if e<=14 else 1024)
+        size = 256 if e<=6 else (512 if e<=10 else 1024)
         batch_size = 32 if size == 256 else (8 if size == 512 else 4)
         base_lr = 5e-4 if size == 256 else (1e-4 if size == 512 else 1e-4)        
 
     
-        if e in [7,15]:
+        if e in [7,11]:
             optimizer.param_groups[0]['lr'] = base_lr
             print(f"\n--- Transitioning to next Stage : img_size : {size}, batch_size:{batch_size}, lr:{base_lr}")
             train_dataset = PneumothoraxDataset(df=df_positive_train, augmentations=data_transformer(phase='train' , size = size))

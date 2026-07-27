@@ -1,4 +1,11 @@
 # CXRay-Pneumothorax-Segmentation
+What is Pneumothorax and how can data science help? 
+
+Pneumothorax refers to the presence of air in the pleural space, between the lung and the chest wall. This causes collapsed lung, because thus the dilation of the chest wall would not involve the dilation of the lung. Shortness of breath, pain in the chest can be symptoms, the level of severity can vary.Experts say this disease can be identified from chest x-ray images, and here comes in the data science.
+
+<img src="https://www.fairview.org/hlimg/krames/344230.jpg" width="300px">
+
+Using a dataset with x-ray images and their diagnosis with the exact place of the air in pleura, a model could be trained to recognize Pneumothorax. Additional information about the patients could also be useful when analyzing an x-ray image.
 
 An AI pipeline that looks at a chest X-ray and answers two questions:
 

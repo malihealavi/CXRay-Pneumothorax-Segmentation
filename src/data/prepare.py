@@ -1,5 +1,6 @@
 import os
 from glob import glob
+import joblib
 
 import pandas as pd
 import pydicom
@@ -7,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 
 from configs.configs import get_config
 
+scaler = StandardScaler()
 
 def create_df_patient(dataframe, path, masks_df, ImageId=None, inference=False):
     """
@@ -57,18 +59,6 @@ def create_df_patient(dataframe, path, masks_df, ImageId=None, inference=False):
     return df
 
 
-def _encode_and_scale(df):
-    """Same class/Sex/ViewPosition encoding + StandardScaler.fit_transform as the notebook."""
-    df['class'] = df['EncodedPixels'].apply(
-        lambda x: 0 if (pd.isna(x) or str(x).strip() == '-1' or str(x).strip() == '') else 1
-    )
-    df['Sex'] = df['Sex'].map({'M': 1, 'F': 0})
-    df['ViewPosition'] = df['ViewPosition'].map({'AP': 1, 'PA': 0})
-    scaler = StandardScaler()
-    df[['Age', 'Sex', 'ViewPosition']] = scaler.fit_transform(df[['Age', 'Sex', 'ViewPosition']])
-    return df
-
-
 def load_stage1_dataframes(cfg=None):
     """
     Reproduces the notebook's "Prepare Data" section end-to-end:
@@ -95,15 +85,16 @@ def load_stage1_dataframes(cfg=None):
     masks = pd.read_csv(os.path.join(root, cfg.paths.train_rle_csv), delimiter=",")
 
     # ---- train_df (Stage 1) ----
+
     train_dicom_dir = os.path.join(root, "dicom-images-train") + "/"
     train_df = create_df_patient(train_paths, train_dicom_dir, masks)
-    train_df = _encode_and_scale(train_df)
+    train_df[['Age','Sex','ViewPosition']] = scaler.fit_transform(train_df[['Age','Sex','ViewPosition']])
+    joblib.dump(scaler, cfg.paths.processed_dir + "/meta_scaler.joblib")
 
     # ---- test_df (Stage 1) ----
     test_dicom_dir = os.path.join(root, "dicom-images-test") + "/"
     test_df = create_df_patient(test_paths, test_dicom_dir, masks)
-    test_df = _encode_and_scale(test_df)
-
+    
     # ---- re-label test_df with Stage 2 ground truth ----
     stage2_train = pd.read_csv(os.path.join(cfg.paths.stage2_root, cfg.paths.stage2_train_csv))
     stage2_train.set_index('ImageId', inplace=True)
@@ -113,7 +104,7 @@ def load_stage1_dataframes(cfg=None):
         except KeyError:
             print(uid)
     test_df['path'] = test_df['path'].str.replace('dicom-images-train', 'dicom-images-test', regex=False)
-    test_df = _encode_and_scale(test_df)
+    test_df[['Age','Sex','ViewPosition']] = scaler.transform(test_df[['Age','Sex','ViewPosition']])
 
     return train_df, test_df, masks
 
@@ -135,8 +126,7 @@ def load_stage2_test_dataframe(cfg=None, masks_df=None):
     test_df_stage2['ViewPosition'] = test_df_stage2['ViewPosition'].map({'AP': 1, 'PA': 0})
     test_df_stage2['Age'] = test_df_stage2['Age'].astype(int)
 
-    scaler = StandardScaler()
-    test_df_stage2[['Age', 'Sex', 'ViewPosition']] = scaler.fit_transform(
+    test_df_stage2[['Age', 'Sex', 'ViewPosition']] = scaler.transform(
         test_df_stage2[['Age', 'Sex', 'ViewPosition']]
     )
     return test_df_stage2
