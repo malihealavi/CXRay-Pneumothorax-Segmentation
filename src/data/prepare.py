@@ -89,7 +89,7 @@ def load_stage1_dataframes(cfg=None):
     train_dicom_dir = os.path.join(root, "dicom-images-train") + "/"
     train_df = create_df_patient(train_paths, train_dicom_dir, masks)
     train_df[['Age','Sex','ViewPosition']] = scaler.fit_transform(train_df[['Age','Sex','ViewPosition']])
-    joblib.dump(scaler, cfg.paths.processed_dir + "/meta_scaler.joblib")
+    joblib.dump(scaler, cfg.paths.processed_dir + "/meta_scaler.pkl")
 
     # ---- test_df (Stage 1) ----
     test_dicom_dir = os.path.join(root, "dicom-images-test") + "/"
