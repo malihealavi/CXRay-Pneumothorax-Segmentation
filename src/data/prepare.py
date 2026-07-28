@@ -95,6 +95,7 @@ def load_stage1_dataframes(cfg=None):
     test_dicom_dir = os.path.join(root, "dicom-images-test") + "/"
     test_df = create_df_patient(test_paths, test_dicom_dir, masks)
     
+    
     # ---- re-label test_df with Stage 2 ground truth ----
     stage2_train = pd.read_csv(os.path.join(cfg.paths.stage2_root, cfg.paths.stage2_train_csv))
     stage2_train.set_index('ImageId', inplace=True)
