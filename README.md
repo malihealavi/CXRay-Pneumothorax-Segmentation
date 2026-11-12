@@ -12,7 +12,7 @@ An AI pipeline that looks at a chest X-ray and answers two questions:
 
 It's built as a **two-stage pipeline** rather than one big model — the reasoning behind that, and everything else in the repo, is explained below in plain language.
 
-> Built from the [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition, refactored from a single Kaggle notebook into a modular codebase. 
+> This project is based on [SIIM-ACR Pneumothorax Segmentation](https://www.kaggle.com/c/siim-acr-pneumothorax-segmentation) Kaggle competition,
 ---
 
 ## Table of Contents
@@ -246,7 +246,7 @@ python src/Deployment/app.py
 
 ---
 
-## Key Metrics Explained
+## Results
 
 | Metric | Plain-English meaning |
 |---|---|
@@ -259,10 +259,3 @@ python src/Deployment/app.py
 
 ---
 
-## License
-
-Released under the MIT License — see [`LICENSE`](./LICENSE) for details.
-
----
-
-*This project is a research/portfolio pipeline built for the SIIM-ACR Kaggle competition. It is not a certified medical device and should not be used for real clinical decision-making.*
